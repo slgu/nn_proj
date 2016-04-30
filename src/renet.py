@@ -3,33 +3,36 @@ from nn import *
 from util import *
 import numpy as np
 class ReNet(object):
-    def __init__(self, input, w, h, c, wp, hp, d):
+    def __init__(self, input, batch_size, w, h, c, wp, hp, d):
         '''
         input: last layer output, or the initial image
         w: input width
         h: input height
+        batch_size: the number of the input sample
         c: input channel num
         wp: width patch length
         hp: height patch length
         d: hidden unit dimension
-        After the four direction rnn the output will be size [(w / wp), (h / hp), 2 * d]
+        After the four direction rnn the output will be size [batch_size, (w / wp), (h / hp), 2 * d]
         '''
-        l_to_r = ReNetDir(input, w, h, c, wp, hp, d, 0)
-        r_to_l = ReNetDir(input, w, h, c, wp, hp, d, 1)
+        l_to_r = ReNetDir(input, batch_size, w, h, c, wp, hp, d, 0)
+        r_to_l = ReNetDir(input, batch_size, w, h, c, wp, hp, d, 1)
         # stack together
-        output1 = T.concatenate([l_to_r.output, r_to_l.output], axis=2)
-        u_to_d  = ReNetDir(output1, w / wp, h / hp, 2 * d, 1, 1, d, 2)
-        d_to_u = ReNetDir(output1, w / wp, h / hp, 2 * d, 1, 1, d, 3)
-        self.output = T.concatenate([u_to_d.output, d_to_u.output], axis=2)
-        self.test = theano.function(inputs=[input], outputs=self.output)
+        output1 = T.concatenate([l_to_r.output, r_to_l.output], axis=3)
+        u_to_d = ReNetDir(output1, batch_size, w / wp, h / hp, 2 * d, 1, 1, d, 2)
+        d_to_u = ReNetDir(output1, batch_size, w / wp, h / hp, 2 * d, 1, 1, d, 3)
+        self.output = T.concatenate([u_to_d.output, d_to_u.output], axis=3)
+        self.test = theano.function([input], self.output)
+        self.params = l_to_r.params + r_to_l.params + u_to_d.params + d_to_u.params
 
 class ReNetDir(object):
-    def __init__(self, input, w, h, c, wp, hp, d, dir):
+    def __init__(self, input, batch_size, w, h, c, wp, hp, d, dir):
         '''
         input: last layer output, or the initial image
         w: input width
         h: input height
         c: input channel num
+        batch_size: the number of the input sample
         wp: width patch length
         hp: height patch length
         d: hidden unit dimension
@@ -38,7 +41,7 @@ class ReNetDir(object):
             1: right to left
             2: up to down
             3: down to up
-        After the four direction rnn the output will be size [(w / wp), (h / hp), 2 * d]
+        After the four direction rnn the output will be size [(batch_size, w / wp), (h / hp), 2 * d]
         '''
         self.h0 = theano.shared(name='h0',
                                 value=numpy.zeros(d,
@@ -77,74 +80,44 @@ class ReNetDir(object):
                                value=numpy.zeros(d,
                                dtype=theano.config.floatX))
 
+        self.params = [self.h0, self.W, self.U, self.b, self.W_r, self.U_r, self.b_r, self.W_u, self.U_u, self.b_u]
         # gated recurrent unit
-        def recurrence(x_t, h_t_prev):
+        # x can be batch_size * I/J * patch vector dimension
+        # h_t_prev batch_size * I/J * h_t_prev
+        def gru_recurrence(x_t, h_t_prev):
             u_t = T.nnet.sigmoid(T.dot(x_t, self.W_u) + T.dot(h_t_prev, self.U_u) + self.b_u)
             r_t = T.nnet.sigmoid(T.dot(x_t, self.W_r) + T.dot(h_t_prev, self.U_r) + self.b_r)
             _h_t = T.tanh(T.dot(x_t, self.W) + T.dot(r_t * h_t_prev, self.U) + self.b)
             h_t = (1 - u_t) * h_t_prev + u_t * _h_t
             return [h_t, h_t]
 
-        res = []
-        # construct batch vector
+
         if dir == 0 or dir == 1:
-            for i in range(w / wp):
-                horizontal_seq = []
-                for j in range(h / hp):
-                    #construct vector
-                    tmp = []
-                    for k in range(0, wp):
-                        for o in range(0, hp):
-                            x = i * wp + k
-                            y = j * hp + o
-                            tmp.append(input[x][y])
-                    in_x = T.concatenate(tmp)
-                    horizontal_seq.append(in_x)
-                #may down to top if dir == 1
-                if dir == 1:
-                    horizontal_seq = list(reversed(horizontal_seq))
-                horizontal_seq = T.stack(horizontal_seq)
-                res.append(horizontal_seq)
+            seq_x = input.reshape((batch_size, w, h / hp, hp * c)).transpose(2,0,1,3).reshape((h/hp, batch_size, w/wp, wp * hp * c))
+            if dir == 1:
+                seq_x  = seq_x[::-1]
+            multi_h0 = T.tile(self.h0, batch_size * w / wp).reshape((batch_size, w / wp, d))
+            [seq_h, s], _ = theano.scan(fn=gru_recurrence,
+                                    sequences=seq_x,
+                                    outputs_info=[multi_h0, None],
+                                    n_steps=seq_x.shape[0])
+            self.output = seq_h.transpose(1,2,0,3)
+            print("output done")
         elif dir == 2 or dir == 3:
-            for j in range(h / hp):
-                vertical_seq = []
-                for i in range(w / wp):
-                    #construct vector
-                    tmp = []
-                    for k in range(0, wp):
-                        for o in range(0, hp):
-                            x = i * wp + k
-                            y = j * hp + o
-                            tmp.append(input[x][y])
-                    in_x = T.concatenate(tmp)
-                    vertical_seq.append(in_x)
-                if dir == 3:
-                    vertical_seq = list(reversed(vertical_seq))
-                vertical_seq = T.stack(vertical_seq)
-                res.append(vertical_seq)
-        else:
-            print("error input dir")
-            exit(0)
-
-        # apply recurrence to get hidden expression
-        in_h = []
-        for item in res:
-            [h, s], _ = theano.scan(fn=recurrence,
-                                    sequences=item,
-                                    outputs_info=[self.h0, None],
-                                    n_steps=item.shape[0])
-            in_h.append(h)
-
-        #output the hidden variable
-        self.input = input
-        self.output = T.stack(in_h)
-
-        #test function to check the rightness of the renet
-        self.test = theano.function(inputs=[input], outputs=self.output)
+            seq_x = input.transpose(0,2,1,3).reshape((batch_size, h, w / wp, wp * c)).transpose(2,0,1,3).reshape((w/hp, batch_size, h/wp, wp * hp * c))
+            if dir == 3:
+                seq_x  = seq_x[::-1]
+            multi_h0 = T.tile(self.h0, batch_size * h / wp).reshape((batch_size, h / wp, d))
+            [seq_h, s], _ = theano.scan(fn=gru_recurrence,
+                                    sequences=seq_x,
+                                    outputs_info=[multi_h0, None],
+                                    n_steps=seq_x.shape[0])
+            self.output = seq_h.transpose(1,0,2,3)
+            print("output done")
 
 if __name__ == '__main__':
     x = T.matrix('x')
-    xx = x.reshape((8, 8, 3))
-    a = ReNet(xx,8,8,3,2,2,7)
-    arr = np.asarray([1]*192, dtype=theano.config.floatX).reshape((8,8,3))
+    xx = x.reshape((4, 32, 32, 3))
+    a = ReNet(xx,4,32,32,3,2,2,14)
+    arr = np.asarray([1]*4*32*32*3, dtype=theano.config.floatX).reshape((4,32,32,3))
     print(a.test(arr).shape)

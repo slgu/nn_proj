@@ -410,6 +410,7 @@ class RNNSLU(object):
         self.sentence_train = theano.function(inputs=[idxs, y_sentence, lr],
                                               outputs=sentence_nll,
                                               updates=sentence_updates)
+
         self.normalize = theano.function(inputs=[],
                                          updates={self.emb:
                                                   self.emb /

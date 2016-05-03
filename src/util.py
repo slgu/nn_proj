@@ -308,9 +308,10 @@ def load_cifar_data(ds_rate=None, theano_shared=True):
     train_set1 = read('../data/cifar-10-batches-py/data_batch_1')
     train_set2 = read('../data/cifar-10-batches-py/data_batch_2')
     train_set3 = read('../data/cifar-10-batches-py/data_batch_3')
-    train_set = merge([train_set1, train_set2, train_set3])
+    train_set4 = read('../data/cifar-10-batches-py/data_batch_4')
+    train_set = merge([train_set1, train_set2, train_set3, train_set4])
     test_set = read('../data/cifar-10-batches-py/test_batch')
-    valid_set = read('../data/cifar-10-batches-py/data_batch_4')
+    valid_set = read('../data/cifar-10-batches-py/data_batch_5')
     l = valid_set[0].shape[0]
     valid_set = [x[-(l//10):] for x in valid_set]
     if theano_shared:

@@ -4,12 +4,14 @@ def test_renet(**kwargs):
         'lr': 0.097,
         'verbose': True,
         'n_epochs':200,
-        'batch_size':200,
+        'batch_size':20,
         'ds_rate':5,
-        'renet_d':10,
-        'w':28,
-        'h':28,
-        'c':1
+        'renet_d':5,
+        'w':32,
+        'h':32,
+        'c':3,
+        'hidden_num':1,
+        'hidden_unit':200
     }
     param_diff = set(kwargs.keys()) - set(param.keys())
     if param_diff:
@@ -22,12 +24,14 @@ def test_renet(**kwargs):
     batch_size = param['batch_size']
     ds_rate = param['ds_rate']
     renet_d = param['renet_d']
+    hidden_unit = param['hidden_unit']
+    hidden_layer_num = param['hidden_num']
     w = param['w']
     h = param['h']
     c = param['c']
     rng = numpy.random.RandomState(23455)
 
-    datasets = load_mnist_data(ds_rate=5)
+    datasets = load_cifar_data(ds_rate=5)
     train_set_x, train_set_y = datasets[0]
     valid_set_x, valid_set_y = datasets[1]
     test_set_x, test_set_y = datasets[2]
@@ -67,29 +71,23 @@ def test_renet(**kwargs):
     print("layer0 done")
     layer1_input = layer0.output.flatten(2)
 
-    layer1 = HiddenLayer(
+    layer1 = myMLP(
         rng,
         input=layer1_input,
         n_in=((renet_d * w * h) / 2),
-        n_out=500,
+        n_hidden=hidden_unit,
+        n_out=10,
+        n_hiddenLayers=hidden_layer_num,
         activation=T.tanh
     )
 
-    print("layer1 done")
-    layer2 = LogisticRegression(
-         input=layer1.output,
-         n_in=500,
-         n_out=10)
-
-    print("layer2 done")
-    # the cost we minimize during training is the NLL of the model
-    cost = layer2.negative_log_likelihood(y)
+    cost = layer1.negative_log_likelihood(y)
 
     print("cost done")
     # create a function to compute the mistakes that are made by the model
     test_model = theano.function(
         [index],
-        layer2.errors(y),
+        layer1.errors(y),
         givens={
             x: test_set_x[index * batch_size: (index + 1) * batch_size],
             y: test_set_y[index * batch_size: (index + 1) * batch_size]
@@ -99,7 +97,7 @@ def test_renet(**kwargs):
 
     validate_model = theano.function(
         [index],
-        layer2.errors(y),
+        layer1.errors(y),
         givens={
             x: valid_set_x[index * batch_size: (index + 1) * batch_size],
             y: valid_set_y[index * batch_size: (index + 1) * batch_size]
@@ -107,7 +105,7 @@ def test_renet(**kwargs):
     )
     print("test valid model done")
 
-    params = layer2.params + layer1.params + layer0.params
+    params = layer1.params + layer0.params
 
     # create a list of gradients for all model parameters
     grads = T.grad(cost, params)
@@ -144,4 +142,4 @@ def test_renet(**kwargs):
 
 
 if __name__ == '__main__':
-    test_renet()
+    test_renet(lr=0.2)

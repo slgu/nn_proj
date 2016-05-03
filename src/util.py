@@ -283,6 +283,32 @@ def load_mnist_data(ds_rate=None, theano_shared=True):
 
     return rval
 
+def load_cifar_data(ds_rate=None, theano_shared=True):
+    import cPickle
+    def read(filename):
+        fo = open(filename, 'rb')
+        dict = cPickle.load(fo)
+        x = numpy.asarray(dict['data'], dtype=theano.config.floatX)
+        n,m = x.shape
+        x = x.reshape((n, 3, 32,32)).transpose(0, 2, 3, 1).reshape((n, 3072))
+        x /= 255.0
+        y = numpy.asarray(dict['labels'])
+        fo.close()
+        return (x, y)
+    train_set = read('../data/cifar-10-batches-py/data_batch_1')
+    test_set = read('../data/cifar-10-batches-py/test_batch')
+    valid_set = read('../data/cifar-10-batches-py/data_batch_2')
+    l = valid_set[0].shape[0]
+    valid_set = [x[-(l//10):] for x in valid_set]
+    if theano_shared:
+        test_set_x, test_set_y = shared_dataset(test_set)
+        valid_set_x, valid_set_y = shared_dataset(valid_set)
+        train_set_x, train_set_y = shared_dataset(train_set)
+        rval = [(train_set_x, train_set_y), (valid_set_x, valid_set_y),
+            (test_set_x, test_set_y)]
+    else:
+        rval = [train_set, valid_set, test_set]
+    return rval
 
 def load_svnh_data(ds_rate=None, theano_shared=True):
     ''' Loads the SVHN dataset
@@ -360,3 +386,6 @@ def load_svnh_data(ds_rate=None, theano_shared=True):
         rval = [train_set, valid_set, test_set]
 
     return rval
+
+if __name__ == '__main__':
+    load_cifar_data()

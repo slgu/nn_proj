@@ -4,12 +4,13 @@ def test_renet(**kwargs):
         'lr': 0.097,
         'verbose': True,
         'n_epochs':200,
-        'batch_size':20,
+        'batch_size':200,
         'ds_rate':5,
         'renet_d':5,
         'w':32,
         'h':32,
         'c':3,
+        'patch_size':4,
         'hidden_num':1,
         'hidden_unit':200
     }
@@ -26,6 +27,8 @@ def test_renet(**kwargs):
     renet_d = param['renet_d']
     hidden_unit = param['hidden_unit']
     hidden_layer_num = param['hidden_num']
+    wp = param['patch_size']
+    hp = param['patch_size']
     w = param['w']
     h = param['h']
     c = param['c']
@@ -64,8 +67,8 @@ def test_renet(**kwargs):
         w=w,
         h=h,
         c=c,
-        wp=2,
-        hp=2,
+        wp=wp,
+        hp=hp,
         d=renet_d
     )
     print("layer0 done")
@@ -74,7 +77,7 @@ def test_renet(**kwargs):
     layer1 = myMLP(
         rng,
         input=layer1_input,
-        n_in=((renet_d * w * h) / 2),
+        n_in=((renet_d * 2) * (w * h / wp / hp)),
         n_hidden=hidden_unit,
         n_out=10,
         n_hiddenLayers=hidden_layer_num,
@@ -142,4 +145,4 @@ def test_renet(**kwargs):
 
 
 if __name__ == '__main__':
-    test_renet(lr=0.2)
+    test_renet(lr=0.1)

@@ -295,9 +295,22 @@ def load_cifar_data(ds_rate=None, theano_shared=True):
         y = numpy.asarray(dict['labels'])
         fo.close()
         return (x, y)
-    train_set = read('../data/cifar-10-batches-py/data_batch_1')
+    def merge(train_sets):
+        x = []
+        y = []
+        for item in train_sets:
+            x.append(item[0])
+            y.append(item[1])
+        x = numpy.concatenate(x)
+        y = numpy.concatenate(y)
+        return (x, y)
+
+    train_set1 = read('../data/cifar-10-batches-py/data_batch_1')
+    train_set2 = read('../data/cifar-10-batches-py/data_batch_2')
+    train_set3 = read('../data/cifar-10-batches-py/data_batch_3')
+    train_set = merge([train_set1, train_set2, train_set3])
     test_set = read('../data/cifar-10-batches-py/test_batch')
-    valid_set = read('../data/cifar-10-batches-py/data_batch_2')
+    valid_set = read('../data/cifar-10-batches-py/data_batch_4')
     l = valid_set[0].shape[0]
     valid_set = [x[-(l//10):] for x in valid_set]
     if theano_shared:

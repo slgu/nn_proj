@@ -71,13 +71,24 @@ def test_renet(**kwargs):
         hp=hp,
         d=renet_d
     )
-    print("layer0 done")
-    layer1_input = layer0.output.flatten(2)
 
-    layer1 = myMLP(
+    layer1 = ReNet(
+        input=layer0.output,
+        batch_size=batch_size,
+        w=w/wp,
+        h=h/hp,
+        c=2*renet_d,
+        wp=wp,
+        hp=hp,
+        d=renet_d
+    )
+
+    layer2_input = layer1.output.flatten(2)
+
+    layer2 = myMLP(
         rng,
-        input=layer1_input,
-        n_in=((renet_d * 2) * (w * h / wp / hp)),
+        input=layer2_input,
+        n_in=((renet_d * 2) * (w * h / wp / hp / wp / hp)),
         n_hidden=hidden_unit,
         n_out=10,
         n_hiddenLayers=hidden_layer_num,
@@ -90,7 +101,7 @@ def test_renet(**kwargs):
     # create a function to compute the mistakes that are made by the model
     test_model = theano.function(
         [index],
-        layer1.errors(y),
+        layer2.errors(y),
         givens={
             x: test_set_x[index * batch_size: (index + 1) * batch_size],
             y: test_set_y[index * batch_size: (index + 1) * batch_size]
@@ -100,7 +111,7 @@ def test_renet(**kwargs):
 
     validate_model = theano.function(
         [index],
-        layer1.errors(y),
+        layer2.errors(y),
         givens={
             x: valid_set_x[index * batch_size: (index + 1) * batch_size],
             y: valid_set_y[index * batch_size: (index + 1) * batch_size]
@@ -108,7 +119,7 @@ def test_renet(**kwargs):
     )
     print("test valid model done")
 
-    params = layer1.params + layer0.params
+    params = layer2.params + layer1.params + layer0.params
 
     # create a list of gradients for all model parameters
     grads = T.grad(cost, params)

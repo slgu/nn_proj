@@ -20,7 +20,6 @@ class ReNet(object):
         r_to_l = ReNetDir(input, batch_size, w, h, c, wp, hp, d, 1)
         # stack together
         output1 = T.concatenate([l_to_r.output, r_to_l.output], axis=3)
-        '''
         # up to down and down to up
         u_to_d = ReNetDir(output1, batch_size, w / wp, h / hp, 2 * d, 1, 1, d, 2)
         d_to_u = ReNetDir(output1, batch_size, w / wp, h / hp, 2 * d, 1, 1, d, 3)
@@ -29,9 +28,6 @@ class ReNet(object):
         self.test = theano.function([input], self.output)
         # get the paramters
         self.params = l_to_r.params + r_to_l.params + u_to_d.params + d_to_u.params
-        '''
-        self.params = l_to_r.params + r_to_l.params
-        self.output = output1
 
 class ReNetDir(object):
     def __init__(self, input, batch_size, w, h, c, wp, hp, d, dir):

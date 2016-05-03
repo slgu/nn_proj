@@ -12,6 +12,9 @@ This code is based on
 
 from collections import OrderedDict
 from itertools import product
+import cPickle, gzip, numpy
+
+
 
 import gzip
 import numpy
@@ -263,6 +266,24 @@ def grid_search(func, gridfunc=None, verbose=False, **kwargs):
         func(**args)
     print('... end of grid search\n')
 
+def load_mnist_data(ds_rate=None, theano_shared=True):
+    f = gzip.open('../data/mnist.pkl.gz', 'rb')
+    train_set, valid_set, test_set = cPickle.load(f)
+    f.close()
+
+    if theano_shared:
+        test_set_x, test_set_y = shared_dataset(test_set)
+        valid_set_x, valid_set_y = shared_dataset(valid_set)
+        train_set_x, train_set_y = shared_dataset(train_set)
+
+        rval = [(train_set_x, train_set_y), (valid_set_x, valid_set_y),
+            (test_set_x, test_set_y)]
+    else:
+        rval = [train_set, valid_set, test_set]
+
+    return rval
+
+
 def load_svnh_data(ds_rate=None, theano_shared=True):
     ''' Loads the SVHN dataset
 
@@ -303,7 +324,7 @@ def load_svnh_data(ds_rate=None, theano_shared=True):
 
     # Convert data format
     def convert_data_format(data):
-        X = data['X'].transpose(2,0,1,3)
+        X = data['X']  #no need for transpose
         X = X.reshape((numpy.prod(X.shape[:-1]), X.shape[-1]),order='C').T / 255.
         y = data['y'].flatten()
         y[y == 10] = 0

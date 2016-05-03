@@ -107,7 +107,7 @@ class ReNetDir(object):
             seq_x = input.transpose(0,2,1,3).reshape((batch_size, h, w / wp, wp * c)).transpose(2,0,1,3).reshape((w/hp, batch_size, h/wp, wp * hp * c))
             if dir == 3:
                 seq_x  = seq_x[::-1]
-            multi_h0 = T.tile(self.h0, batch_size * h / wp).reshape((batch_size, h / wp, d))
+            multi_h0 = T.tile(self.h0, batch_size * h / hp).reshape((batch_size, h / hp, d))
             [seq_h, s], _ = theano.scan(fn=gru_recurrence,
                                     sequences=seq_x,
                                     outputs_info=[multi_h0, None],

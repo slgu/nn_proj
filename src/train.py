@@ -4,7 +4,12 @@ def test_renet(**kwargs):
         'lr': 0.097,
         'verbose': True,
         'n_epochs':200,
-        'batch_size':200
+        'batch_size':200,
+        'ds_rate':5,
+        'renet_d':10,
+        'w':28,
+        'h':28,
+        'c':1
     }
     param_diff = set(kwargs.keys()) - set(param.keys())
     if param_diff:
@@ -15,9 +20,14 @@ def test_renet(**kwargs):
             print("%s: %s" % (k,v))
     learning_rate = param['lr']
     batch_size = param['batch_size']
+    ds_rate = param['ds_rate']
+    renet_d = param['renet_d']
+    w = param['w']
+    h = param['h']
+    c = param['c']
     rng = numpy.random.RandomState(23455)
-    datasets = load_svnh_data(ds_rate=5)
 
+    datasets = load_mnist_data(ds_rate=5)
     train_set_x, train_set_y = datasets[0]
     valid_set_x, valid_set_y = datasets[1]
     test_set_x, test_set_y = datasets[2]
@@ -43,27 +53,24 @@ def test_renet(**kwargs):
 
     # Reshape matrix of rasterized images of shape (batch_size, 3 * 32 * 32)
     # to a 4D tensor, compatible with our LeNetConvPoolLayer
-    layer0_input = x.reshape((batch_size, 32, 32, 3))
-
-    print(batch_size)
+    layer0_input = x.reshape((batch_size, w, h, c))
     layer0 = ReNet(
         input=layer0_input,
         batch_size=batch_size,
-        w=32,
-        h=32,
-        c=3,
+        w=w,
+        h=h,
+        c=c,
         wp=2,
         hp=2,
-        d=20
+        d=renet_d
     )
-
     print("layer0 done")
     layer1_input = layer0.output.flatten(2)
 
     layer1 = HiddenLayer(
         rng,
         input=layer1_input,
-        n_in=16 * 16 * 20 * 2,
+        n_in=((renet_d * w * h) / 2),
         n_out=500,
         activation=T.tanh
     )

@@ -290,8 +290,8 @@ def load_cifar_data(ds_rate=None, theano_shared=True):
         dict = cPickle.load(fo)
         x = numpy.asarray(dict['data'], dtype=theano.config.floatX)
         n,m = x.shape
-        x = x.reshape((n, 3, 32,32)).transpose(0, 2, 3, 1).reshape((n, 3072))
-        x /= 255.0
+        x = x.reshape((n, 3,32,32)).transpose(0, 2, 3, 1).reshape((n, 32 * 32 * 3))
+        x = (x / 255.0) - 0.5
         y = numpy.asarray(dict['labels'])
         fo.close()
         return (x, y)

@@ -72,6 +72,7 @@ def test_renet(**kwargs):
         d=renet_d
     )
 
+    '''
     layer1 = ReNet(
         input=layer0.output,
         batch_size=batch_size,
@@ -82,20 +83,20 @@ def test_renet(**kwargs):
         hp=hp,
         d=renet_d
     )
-
-    layer2_input = layer1.output.flatten(2)
+    '''
+    layer2_input = layer0.output.flatten(2)
 
     layer2 = myMLP(
         rng,
         input=layer2_input,
-        n_in=((renet_d * 2) * (w * h / wp / hp / wp / hp)),
+        n_in=((renet_d * 2) * (w * h / wp / hp)),
         n_hidden=hidden_unit,
         n_out=10,
         n_hiddenLayers=hidden_layer_num,
         activation=T.tanh
     )
 
-    cost = layer1.negative_log_likelihood(y)
+    cost = layer2.negative_log_likelihood(y)
 
     print("cost done")
     # create a function to compute the mistakes that are made by the model
@@ -119,7 +120,7 @@ def test_renet(**kwargs):
     )
     print("test valid model done")
 
-    params = layer2.params + layer1.params + layer0.params
+    params = layer2.params + layer0.params
 
     # create a list of gradients for all model parameters
     grads = T.grad(cost, params)

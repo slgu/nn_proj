@@ -16,13 +16,13 @@ class ReNet(object):
         After the four direction rnn the output will be size [batch_size, (w / wp), (h / hp), 2 * d]
         '''
         # first get left to right right to left hidden expression then stack
-        l_to_r = ReNetDir(input, batch_size, w, h, c, wp, hp, d, 0)
-        r_to_l = ReNetDir(input, batch_size, w, h, c, wp, hp, d, 1)
+        l_to_r = ReNetDir(input, batch_size, w, h, c, wp, hp, d, 2)
+        r_to_l = ReNetDir(input, batch_size, w, h, c, wp, hp, d, 3)
         # stack together
         output1 = T.concatenate([l_to_r.output, r_to_l.output], axis=3)
         # up to down and down to up
-        u_to_d = ReNetDir(output1, batch_size, w / wp, h / hp, 2 * d, 1, 1, d, 2)
-        d_to_u = ReNetDir(output1, batch_size, w / wp, h / hp, 2 * d, 1, 1, d, 3)
+        u_to_d = ReNetDir(output1, batch_size, w / wp, h / hp, 2 * d, 1, 1, d, 0)
+        d_to_u = ReNetDir(output1, batch_size, w / wp, h / hp, 2 * d, 1, 1, d, 1)
         # get the output
         self.output = T.concatenate([u_to_d.output, d_to_u.output], axis=3)
         self.test = theano.function([input], self.output)

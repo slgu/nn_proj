@@ -13,7 +13,7 @@ This code is based on
 from collections import OrderedDict
 from itertools import product
 import cPickle, gzip, numpy
-
+import random
 
 
 import gzip
@@ -283,7 +283,10 @@ def load_mnist_data(ds_rate=None, theano_shared=True):
 
     return rval
 
-def load_cifar_data(ds_rate=None, theano_shared=True):
+
+import math
+
+def load_cifar_data(ds_rate=None, theano_shared=True,aug=False):
     import cPickle
     def read(filename):
         fo = open(filename, 'rb')
@@ -294,7 +297,7 @@ def load_cifar_data(ds_rate=None, theano_shared=True):
         x = (x / 255.0) - 0.5
         y = numpy.asarray(dict['labels'])
         fo.close()
-        return (x, y)
+        return [x, y]
     def merge(train_sets):
         x = []
         y = []
@@ -303,7 +306,7 @@ def load_cifar_data(ds_rate=None, theano_shared=True):
             y.append(item[1])
         x = numpy.concatenate(x)
         y = numpy.concatenate(y)
-        return (x, y)
+        return [x, y]
 
     train_set1 = read('../data/cifar-10-batches-py/data_batch_1')
     train_set2 = read('../data/cifar-10-batches-py/data_batch_2')
@@ -314,6 +317,43 @@ def load_cifar_data(ds_rate=None, theano_shared=True):
     valid_set = read('../data/cifar-10-batches-py/data_batch_5')
     l = valid_set[0].shape[0]
     valid_set = [x[-(l//10):] for x in valid_set]
+    def shift(data, dim):
+        dimension = data.shape[0]
+        edge = int(math.sqrt(dimension / 3))
+        dirx = [0, 0, 2, -2]
+        diry = [-2, 2, 0, 0]
+        res = numpy.zeros((dimension,), data.dtype)
+        for j in range(0, edge):
+            for k in range(0, edge):
+                newx = j + dirx[dim]
+                newy = k + diry[dim]
+                if newx < 0 or newx >= edge or newy < 0 or newy >= edge:
+                    continue
+                idx = j * edge + k
+                newidx = newx * edge + newy
+                res[3 * newidx] = data[3 * idx]
+                res[3 * newidx + 1] = data[3 * idx + 1]
+                res[3 * newidx + 2] = data[3 * idx + 2]
+        return res
+
+    # if data augmentation then do it
+    if aug:
+        n, dimension = train_set[0].shape
+        # 25% l 25% r
+        for i in range(0, n):
+            r = random.uniform(0,1) * 4
+            if r < 1:
+                train_set[0][i] = shift(train_set[0][i], 0)
+            elif r < 2:
+                train_set[0][i] = shift(train_set[0][i], 1)
+        # 25% u 25% d
+        for i in range(0, n):
+            r = random.uniform(0,1) * 4
+            if r < 1:
+                train_set[0][i] = shift(train_set[0][i], 2)
+            elif r < 2:
+                train_set[0][i] = shift(train_set[0][i], 3)
+    print(train_set[0].shape)
     if theano_shared:
         test_set_x, test_set_y = shared_dataset(test_set)
         valid_set_x, valid_set_y = shared_dataset(valid_set)

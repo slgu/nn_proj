@@ -144,7 +144,8 @@ def test_renet(**kwargs):
         'patch_size':4,
         'hidden_num':1,
         'hidden_unit':200,
-        'aug':True
+        'aug':True,
+        'renet_num':3
     }
     param_diff = set(kwargs.keys()) - set(param.keys())
     if param_diff:
@@ -165,6 +166,7 @@ def test_renet(**kwargs):
     h = param['h']
     c = param['c']
     aug = param['aug']
+    renet_num = param['renet_num']
     rng = numpy.random.RandomState(23455)
 
     datasets = load_cifar_data(ds_rate=5,aug=aug)
@@ -205,25 +207,32 @@ def test_renet(**kwargs):
         hp=hp,
         d=renet_d
     )
+    renet_layers = [layer0]
+    w_i = w
+    h_i = h
 
-    '''
-    layer1 = ReNet(
-        input=layer0.output,
-        batch_size=batch_size,
-        w=w/wp,
-        h=h/hp,
-        c=2*renet_d,
-        wp=wp,
-        hp=hp,
-        d=renet_d
-    )
-    '''
-    layer2_input = layer0.output.flatten(2)
+    for i in range(1, renet_num):
+        w_i /= wp
+        h_i /= hp
+        layer_tmp = ReNet(
+            input=renet_layers[i - 1].output,
+            batch_size=batch_size,
+            w=w_i,
+            h=h_i,
+            c=2*renet_d,
+            wp=wp,
+            hp=hp,
+            d=renet_d
+        )
+        renet_layers.append(layer_tmp)
 
+    layer2_input = renet_layers[-1].output.flatten(2)
+    w_i /= wp
+    h_i /= hp
     layer2 = myMLP(
         rng,
         input=layer2_input,
-        n_in=((renet_d * 2) * (w * h / wp / hp)),
+        n_in=w_i * h_i * renet_d * 2,
         n_hidden=hidden_unit,
         n_out=10,
         n_hiddenLayers=hidden_layer_num,
@@ -254,7 +263,9 @@ def test_renet(**kwargs):
     )
     print("test valid model done")
 
-    params = layer2.params + layer0.params
+    params = layer2.params
+    for i in range(0, renet_num):
+        params += renet_layers[i].params
 
     # create a list of gradients for all model parameters
     grads = T.grad(cost, params)
@@ -291,4 +302,4 @@ def test_renet(**kwargs):
 
 
 if __name__ == '__main__':
-    test_renet(lr=0.1, renet_d=20)
+    test_renet(lr=0.1, renet_d=20, patch_size=2, renet_num=3)

@@ -405,7 +405,10 @@ def load_svnh_data(ds_rate=None, theano_shared=True):
     # Convert data format
     def convert_data_format(data):
         X = data['X']  #no need for transpose
-        X = X.reshape((numpy.prod(X.shape[:-1]), X.shape[-1]),order='C').T / 255.
+        X = numpy.transpose(X, (3, 0, 1, 2))
+        X = X / 255.0
+        n = X.shape[0]
+        X = X.reshape((n, 32 * 32 * 3))
         y = data['y'].flatten()
         y[y == 10] = 0
         return (X,y)

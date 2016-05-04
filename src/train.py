@@ -145,7 +145,9 @@ def test_renet(**kwargs):
         'hidden_num':1,
         'hidden_unit':200,
         'aug':True,
-        'renet_num':3
+        'renet_num':3,
+        'unit_option':"gru",
+        "dataset":"svhn"
     }
     param_diff = set(kwargs.keys()) - set(param.keys())
     if param_diff:
@@ -165,11 +167,20 @@ def test_renet(**kwargs):
     w = param['w']
     h = param['h']
     c = param['c']
+    datasource = param['dataset']
     aug = param['aug']
     renet_num = param['renet_num']
+    unit_option = param['unit_option']
     rng = numpy.random.RandomState(23455)
 
-    datasets = load_cifar_data(ds_rate=5,aug=aug)
+    # datasets = load_cifar_data(ds_rate=5,aug=aug)
+    if datasource == "svhn":
+        datasets = load_svnh_data(ds_rate=5)
+    elif datasource == "mnist":
+        datasets = load_mnist_data()
+    else:
+        datasets = load_cifar_data(aug=aug)
+
     train_set_x, train_set_y = datasets[0]
     valid_set_x, valid_set_y = datasets[1]
     test_set_x, test_set_y = datasets[2]
@@ -205,7 +216,8 @@ def test_renet(**kwargs):
         c=c,
         wp=wp,
         hp=hp,
-        d=renet_d
+        d=renet_d,
+        unit_option=unit_option
     )
     renet_layers = [layer0]
     w_i = w
@@ -222,7 +234,8 @@ def test_renet(**kwargs):
             c=2*renet_d,
             wp=wp,
             hp=hp,
-            d=renet_d
+            d=renet_d,
+            unit_option=unit_option
         )
         renet_layers.append(layer_tmp)
 
@@ -302,4 +315,4 @@ def test_renet(**kwargs):
 
 
 if __name__ == '__main__':
-    test_renet(lr=0.1, renet_d=20, patch_size=2, renet_num=3)
+    test_renet(lr=0.1, renet_d=20, patch_size=2, renet_num=1, unit_option="lstm")

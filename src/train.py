@@ -207,50 +207,62 @@ def test_renet(**kwargs):
 
     # Reshape matrix of rasterized images of shape (batch_size, 3 * 32 * 32)
     # to a 4D tensor, compatible with our LeNetConvPoolLayer
-    layer0_input = x.reshape((batch_size, w, h, c))
-    layer0 = ReNet(
-        input=layer0_input,
-        batch_size=batch_size,
-        w=w,
-        h=h,
-        c=c,
-        wp=wp,
-        hp=hp,
-        d=renet_d,
-        unit_option=unit_option
-    )
-    renet_layers = [layer0]
-    w_i = w
-    h_i = h
-
-    for i in range(1, renet_num):
-        w_i /= wp
-        h_i /= hp
-        layer_tmp = ReNet(
-            input=renet_layers[i - 1].output,
+    if renet_num == 0:
+        renet_layers = []
+        layer2 = myMLP(
+            rng,
+            input=x,
+            n_in=w * h * c,
+            n_hidden=hidden_unit,
+            n_out=10,
+            n_hiddenLayers=hidden_layer_num,
+            activation=T.tanh
+        )
+    else:
+        layer0_input = x.reshape((batch_size, w, h, c))
+        layer0 = ReNet(
+            input=layer0_input,
             batch_size=batch_size,
-            w=w_i,
-            h=h_i,
-            c=2*renet_d,
+            w=w,
+            h=h,
+            c=c,
             wp=wp,
             hp=hp,
             d=renet_d,
             unit_option=unit_option
         )
-        renet_layers.append(layer_tmp)
+        renet_layers = [layer0]
+        w_i = w
+        h_i = h
 
-    layer2_input = renet_layers[-1].output.flatten(2)
-    w_i /= wp
-    h_i /= hp
-    layer2 = myMLP(
-        rng,
-        input=layer2_input,
-        n_in=w_i * h_i * renet_d * 2,
-        n_hidden=hidden_unit,
-        n_out=10,
-        n_hiddenLayers=hidden_layer_num,
-        activation=T.tanh
-    )
+        for i in range(1, renet_num):
+            w_i /= wp
+            h_i /= hp
+            layer_tmp = ReNet(
+                input=renet_layers[i - 1].output,
+                batch_size=batch_size,
+                w=w_i,
+                h=h_i,
+                c=2*renet_d,
+                wp=wp,
+                hp=hp,
+                d=renet_d,
+                unit_option=unit_option
+            )
+            renet_layers.append(layer_tmp)
+
+        layer2_input = renet_layers[-1].output.flatten(2)
+        w_i /= wp
+        h_i /= hp
+        layer2 = myMLP(
+            rng,
+            input=layer2_input,
+            n_in=w_i * h_i * renet_d * 2,
+            n_hidden=hidden_unit,
+            n_out=10,
+            n_hiddenLayers=hidden_layer_num,
+            activation=T.tanh
+        )
 
     cost = layer2.negative_log_likelihood(y)
 

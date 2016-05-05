@@ -147,7 +147,7 @@ def test_renet(**kwargs):
         'aug':True,
         'renet_num':3,
         'unit_option':"gru",
-        "dataset":"svhn"
+        "dataset":"cifar"
     }
     param_diff = set(kwargs.keys()) - set(param.keys())
     if param_diff:
@@ -327,4 +327,4 @@ def test_renet(**kwargs):
 
 
 if __name__ == '__main__':
-    test_renet(lr=0.1, renet_d=40, patch_size=2, renet_num=1, unit_option="lstm")
+    test_renet(lr=0.1, renet_d=40, patch_size=2, renet_num=1)

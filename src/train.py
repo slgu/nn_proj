@@ -315,4 +315,4 @@ def test_renet(**kwargs):
 
 
 if __name__ == '__main__':
-    test_renet(lr=0.1, renet_d=20, patch_size=2, renet_num=1, unit_option="lstm")
+    test_renet(lr=0.1, renet_d=40, patch_size=2, renet_num=1, unit_option="lstm")

@@ -144,7 +144,10 @@ def test_renet(**kwargs):
         'patch_size':4,
         'hidden_num':1,
         'hidden_unit':200,
-        'aug':True
+        'aug':True,
+        'renet_num':3,
+        'unit_option':"gru",
+        "dataset":"cifar"
     }
     param_diff = set(kwargs.keys()) - set(param.keys())
     if param_diff:
@@ -164,10 +167,20 @@ def test_renet(**kwargs):
     w = param['w']
     h = param['h']
     c = param['c']
+    datasource = param['dataset']
     aug = param['aug']
+    renet_num = param['renet_num']
+    unit_option = param['unit_option']
     rng = numpy.random.RandomState(23455)
 
-    datasets = load_cifar_data(ds_rate=5,aug=aug)
+    # datasets = load_cifar_data(ds_rate=5,aug=aug)
+    if datasource == "svhn":
+        datasets = load_svnh_data(ds_rate=5)
+    elif datasource == "mnist":
+        datasets = load_mnist_data()
+    else:
+        datasets = load_cifar_data(aug=aug)
+
     train_set_x, train_set_y = datasets[0]
     valid_set_x, valid_set_y = datasets[1]
     test_set_x, test_set_y = datasets[2]
@@ -191,44 +204,64 @@ def test_renet(**kwargs):
     # BUILD ACTUAL MODEL #
     ######################
     print('... building the model')
-
     # Reshape matrix of rasterized images of shape (batch_size, 3 * 32 * 32)
     # to a 4D tensor, compatible with our LeNetConvPoolLayer
-    layer0_input = x.reshape((batch_size, w, h, c))
-    layer0 = ReNet(
-        input=layer0_input,
-        batch_size=batch_size,
-        w=w,
-        h=h,
-        c=c,
-        wp=wp,
-        hp=hp,
-        d=renet_d
-    )
+    if renet_num == 0:
+        renet_layers = []
+        layer2 = myMLP(
+            rng,
+            input=x,
+            n_in=w * h * c,
+            n_hidden=hidden_unit,
+            n_out=10,
+            n_hiddenLayers=hidden_layer_num,
+            activation=T.tanh
+        )
+    else:
+        layer0_input = x.reshape((batch_size, w, h, c))
+        layer0 = ReNet(
+            input=layer0_input,
+            batch_size=batch_size,
+            w=w,
+            h=h,
+            c=c,
+            wp=wp,
+            hp=hp,
+            d=renet_d,
+            unit_option=unit_option
+        )
+        renet_layers = [layer0]
+        w_i = w
+        h_i = h
 
-    """
-    layer1 = ReNet(
-        input=layer0.output,
-        batch_size=batch_size,
-        w=w/wp,
-        h=h/hp,
-        c=2*renet_d,
-        wp=wp,
-        hp=hp,
-        d=renet_d
-    )
-    """
-    layer2_input = layer0.output.flatten(2)
-    
-    layer2 = myMLP(
-        rng,
-        input=layer2_input,
-        n_in=((renet_d * 2) * (w * h / wp / hp )),
-        n_hidden=hidden_unit,
-        n_out=10,
-        n_hiddenLayers=hidden_layer_num,
-        activation=T.tanh
-    )
+        for i in range(1, renet_num):
+            w_i /= wp
+            h_i /= hp
+            layer_tmp = ReNet(
+                input=renet_layers[i - 1].output,
+                batch_size=batch_size,
+                w=w_i,
+                h=h_i,
+                c=2*renet_d,
+                wp=wp,
+                hp=hp,
+                d=renet_d,
+                unit_option=unit_option
+            )
+            renet_layers.append(layer_tmp)
+
+        layer2_input = renet_layers[-1].output.flatten(2)
+        w_i /= wp
+        h_i /= hp
+        layer2 = myMLP(
+            rng,
+            input=layer2_input,
+            n_in=w_i * h_i * renet_d * 2,
+            n_hidden=hidden_unit,
+            n_out=10,
+            n_hiddenLayers=hidden_layer_num,
+            activation=T.tanh
+        )
 
     cost = layer2.negative_log_likelihood(y)
 
@@ -254,7 +287,9 @@ def test_renet(**kwargs):
     )
     print("test valid model done")
 
-    params = layer2.params + layer0.params
+    params = layer2.params
+    for i in range(0, renet_num):
+        params += renet_layers[i].params
 
     # create a list of gradients for all model parameters
     grads = T.grad(cost, params)
@@ -293,4 +328,4 @@ def test_renet(**kwargs):
 
 
 if __name__ == '__main__':
-    test_renet(lr=0.1, renet_d=20)
+    test_renet(lr=0.1, renet_d=40, patch_size=2, renet_num=1)

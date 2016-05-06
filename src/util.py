@@ -28,6 +28,7 @@ import sys
 
 import theano
 import theano.tensor as T
+import cifar10_cnn
 
 def check_dir(dirname):
     if not os.path.exists(dirname):
@@ -288,13 +289,14 @@ import math
 
 def load_cifar_data(ds_rate=None, theano_shared=True,aug=False):
     import cPickle
+    aug = False
     def read(filename):
         fo = open(filename, 'rb')
         dict = cPickle.load(fo)
         x = numpy.asarray(dict['data'], dtype=theano.config.floatX)
         n,m = x.shape
-        x = x.reshape((n, 3,32,32)).transpose(0, 2, 3, 1).reshape((n, 32 * 32 * 3))
-        x = (x / 255.0) - 0.5
+        x = x.reshape((n, 3,32,32))
+        # x = x.transpose(0, 2, 3, 1).reshape((n, 32 * 32 * 3))
         y = numpy.asarray(dict['labels'])
         fo.close()
         return [x, y]
@@ -312,11 +314,20 @@ def load_cifar_data(ds_rate=None, theano_shared=True,aug=False):
     train_set2 = read('../data/cifar-10-batches-py/data_batch_2')
     train_set3 = read('../data/cifar-10-batches-py/data_batch_3')
     train_set4 = read('../data/cifar-10-batches-py/data_batch_4')
-    train_set = merge([train_set1, train_set2, train_set3, train_set4])
+    train_set5 = read('../data/cifar-10-batches-py/data_batch_5')
+    train_set = merge([train_set1, train_set2, train_set3, train_set4, train_set5])
     test_set = read('../data/cifar-10-batches-py/test_batch')
-    valid_set = read('../data/cifar-10-batches-py/data_batch_5')
-    l = valid_set[0].shape[0]
-    valid_set = [x[-(l//10):] for x in valid_set]
+    cifar10_cnn.datagen.fit(train_set[0])
+    for i in range(0, train_set[0].shape[0]):
+        train_set[0][i] = cifar10_cnn.datagen.standardize(train_set[0][i])
+    train_set[0] = train_set[0].transpose(0, 2, 3, 1).reshape((train_set[0].shape[0], 32 * 32 * 3))
+    for i in range(0, test_set[0].shape[0]):
+        test_set[0][i] = cifar10_cnn.datagen.standardize(test_set[0][i])
+    test_set[0] = test_set[0].transpose(0, 2, 3, 1).reshape((test_set[0].shape[0], 32 * 32 * 3))
+
+    train_set_len = len(train_set[1])
+    valid_set = [x[-(train_set_len//10):] for x in train_set]
+    train_set = [x[:-(train_set_len//10)] for x in train_set]
     def shift(data, dim):
         dimension = data.shape[0]
         edge = int(math.sqrt(dimension / 3))
@@ -405,7 +416,10 @@ def load_svnh_data(ds_rate=None, theano_shared=True):
     # Convert data format
     def convert_data_format(data):
         X = data['X']  #no need for transpose
-        X = X.reshape((numpy.prod(X.shape[:-1]), X.shape[-1]),order='C').T / 255.
+        X = numpy.transpose(X, (3, 0, 1, 2))
+        X = X / 255.0
+        n = X.shape[0]
+        X = X.reshape((n, 32 * 32 * 3))
         y = data['y'].flatten()
         y[y == 10] = 0
         return (X,y)

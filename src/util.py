@@ -289,7 +289,6 @@ import math
 
 def load_cifar_data(ds_rate=None, theano_shared=True,aug=False):
     import cPickle
-    aug = False
     def read(filename):
         fo = open(filename, 'rb')
         dict = cPickle.load(fo)
@@ -347,7 +346,6 @@ def load_cifar_data(ds_rate=None, theano_shared=True,aug=False):
                 res[3 * newidx + 1] = data[3 * idx + 1]
                 res[3 * newidx + 2] = data[3 * idx + 2]
         return res
-
     # if data augmentation then do it
     if aug:
         n, dimension = train_set[0].shape

@@ -28,7 +28,7 @@ import sys
 
 import theano
 import theano.tensor as T
-import cifar10_cnn
+# import cifar10_cnn
 
 def check_dir(dirname):
     if not os.path.exists(dirname):
@@ -317,6 +317,7 @@ def load_cifar_data(ds_rate=None, theano_shared=True,aug=False):
     train_set5 = read('../data/cifar-10-batches-py/data_batch_5')
     train_set = merge([train_set1, train_set2, train_set3, train_set4, train_set5])
     test_set = read('../data/cifar-10-batches-py/test_batch')
+    '''
     cifar10_cnn.datagen.fit(train_set[0])
     for i in range(0, train_set[0].shape[0]):
         train_set[0][i] = cifar10_cnn.datagen.standardize(train_set[0][i])
@@ -324,7 +325,7 @@ def load_cifar_data(ds_rate=None, theano_shared=True,aug=False):
     for i in range(0, test_set[0].shape[0]):
         test_set[0][i] = cifar10_cnn.datagen.standardize(test_set[0][i])
     test_set[0] = test_set[0].transpose(0, 2, 3, 1).reshape((test_set[0].shape[0], 32 * 32 * 3))
-
+    '''
     train_set_len = len(train_set[1])
     valid_set = [x[-(train_set_len//10):] for x in train_set]
     train_set = [x[:-(train_set_len//10)] for x in train_set]

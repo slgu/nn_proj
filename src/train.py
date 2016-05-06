@@ -299,7 +299,7 @@ def test_renet(**kwargs):
     # manually create an update rule for each model parameter. We thus
     # create the updates list by automatically looping over all
     # (params[i], grads[i]) pairs.
-    
+
     l_r = theano.shared(value=learning_rate)
     updates = [
         (param_i, param_i - l_r.astype(theano.config.floatX) * grad_i)

@@ -206,7 +206,7 @@ def test_renet(**kwargs):
         d=renet_d
     )
 
-    '''
+    """
     layer1 = ReNet(
         input=layer0.output,
         batch_size=batch_size,
@@ -217,13 +217,13 @@ def test_renet(**kwargs):
         hp=hp,
         d=renet_d
     )
-    '''
+    """
     layer2_input = layer0.output.flatten(2)
-
+    
     layer2 = myMLP(
         rng,
         input=layer2_input,
-        n_in=((renet_d * 2) * (w * h / wp / hp)),
+        n_in=((renet_d * 2) * (w * h / wp / hp )),
         n_hidden=hidden_unit,
         n_out=10,
         n_hiddenLayers=hidden_layer_num,
@@ -264,8 +264,10 @@ def test_renet(**kwargs):
     # manually create an update rule for each model parameter. We thus
     # create the updates list by automatically looping over all
     # (params[i], grads[i]) pairs.
+    
+    l_r = theano.shared(value=learning_rate)
     updates = [
-        (param_i, param_i - learning_rate * grad_i)
+        (param_i, param_i - l_r.astype(theano.config.floatX) * grad_i)
         for param_i, grad_i in zip(params, grads)
     ]
     print("update done")
@@ -287,7 +289,7 @@ def test_renet(**kwargs):
     print('... training')
 
     train_nn(train_model, validate_model, test_model,
-        n_train_batches, n_valid_batches, n_test_batches, param['n_epochs'], param['verbose'])
+        n_train_batches, n_valid_batches, n_test_batches, param['n_epochs'], l_r, learning_rate, param['verbose'])
 
 
 if __name__ == '__main__':

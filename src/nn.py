@@ -440,7 +440,7 @@ class RNNSLU(object):
                             param.name + '.npy')))
 
 def train_nn(train_model, validate_model, test_model,
-            n_train_batches, n_valid_batches, n_test_batches, n_epochs,
+            n_train_batches, n_valid_batches, n_test_batches, n_epochs, l_r, learning_rate,
             verbose = True):
     """
     Wrapper function for training and test THEANO model
@@ -490,9 +490,12 @@ def train_nn(train_model, validate_model, test_model,
 
     epoch = 0
     done_looping = False
-
+    
+    d_lr = 1
     while (epoch < n_epochs) and (not done_looping):
+        
         epoch = epoch + 1
+        
         for minibatch_index in range(n_train_batches):
 
             iter = (epoch - 1) * n_train_batches + minibatch_index
@@ -509,12 +512,16 @@ def train_nn(train_model, validate_model, test_model,
                 this_validation_loss = numpy.mean(validation_losses)
 
                 if verbose:
-                    print('epoch %i, minibatch %i/%i, validation error %f %%' %
+                    print('epoch %i, learning_rate %f minibatch %i/%i, validation error %f %%' %
                         (epoch,
+                         l_r.get_value(),
                          minibatch_index + 1,
                          n_train_batches,
                          this_validation_loss * 100.))
-
+                
+                if (best_validation_loss-this_validation_loss)*100 < 0.2:
+                    l_r.set_value(learning_rate/(1+d_lr*0.1))
+                    d_lr += 1
                 # if we got the best validation score until now
                 if this_validation_loss < best_validation_loss:
 

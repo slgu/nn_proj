@@ -147,7 +147,8 @@ def test_renet(**kwargs):
         'aug':True,
         'renet_num':3,
         'unit_option':"gru",
-        "dataset":"cifar"
+        "dataset":"cifar",
+        "adapt":True
     }
     param_diff = set(kwargs.keys()) - set(param.keys())
     if param_diff:
@@ -171,6 +172,7 @@ def test_renet(**kwargs):
     aug = param['aug']
     renet_num = param['renet_num']
     unit_option = param['unit_option']
+    adapt = param['adapt']
     rng = numpy.random.RandomState(23455)
 
     # datasets = load_cifar_data(ds_rate=5,aug=aug)
@@ -324,7 +326,7 @@ def test_renet(**kwargs):
     print('... training')
 
     train_nn(train_model, validate_model, test_model,
-        n_train_batches, n_valid_batches, n_test_batches, param['n_epochs'], l_r, learning_rate, param['verbose'])
+        n_train_batches, n_valid_batches, n_test_batches, param['n_epochs'], l_r, learning_rate, adapt, param['verbose'])
 
 
 if __name__ == '__main__':

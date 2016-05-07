@@ -1,0 +1,48 @@
+This is BibTeX, Version 0.99d (TeX Live 2014)
+Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
+The top-level auxiliary file: /Users/kzhu9/Dropbox/16spring/NNDL6040/final/report/.texpadtmp/docultex.aux
+The style file: ../siam.bst.bst
+Database file #1: ../bibl.bib
+Warning--to sort, need author or key in imgcls
+You've used 3 entries,
+            2030 wiz_defined-function locations,
+            514 strings with 4405 characters,
+and the built_in function-call counts, 1032 in all, are:
+= -- 84
+> -- 61
+< -- 0
++ -- 23
+- -- 20
+* -- 83
+:= -- 167
+add.period$ -- 4
+call.type$ -- 3
+change.case$ -- 17
+chr.to.int$ -- 0
+cite$ -- 4
+duplicate$ -- 43
+empty$ -- 82
+format.name$ -- 20
+if$ -- 214
+int.to.chr$ -- 0
+int.to.str$ -- 3
+missing$ -- 2
+newline$ -- 13
+num.names$ -- 6
+pop$ -- 26
+preamble$ -- 1
+purify$ -- 14
+quote$ -- 0
+skip$ -- 30
+stack$ -- 0
+substring$ -- 47
+swap$ -- 13
+text.length$ -- 0
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 12
+warning$ -- 1
+while$ -- 8
+width$ -- 4
+write$ -- 27
+(There was 1 warning)

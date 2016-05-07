@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.15 (TeX Live 2014) (preloaded format=pdflatex 2015.5.5)  30 APR 2016 19:11
+This is pdfTeX, Version 3.14159265-2.6-1.40.15 (TeX Live 2014) (preloaded format=pdflatex 2015.5.5)  6 MAY 2016 22:23
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -159,7 +159,7 @@ Package: ltxcmds 2011/11/09 v1.22 LaTeX kernel commands for general use (HO)
 ))
 \Gin@req@height=\dimen126
 \Gin@req@width=\dimen127
-) (/Users/kzhu9/Dropbox/16spring/NNDL6040/final/report/.texpadtmp/docultex.aux)
+) (/Users/kzhu9/Dropbox/16spring/NNDL6040/final/nn_proj/report/.texpadtmp/docultex.aux)
 \openout1 = `docultex.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 10.
@@ -247,47 +247,146 @@ Underfull \hbox (badness 10000) in paragraph at lines 45--46
 
  []
 
+[1
 
+{/usr/local/texlive/2014/texmf-var/fonts/map/pdftex/updmap/pdftex.map}]
 Underfull \hbox (badness 10000) in paragraph at lines 47--48
 
  []
 
-[1
 
-{/usr/local/texlive/2014/texmf-var/fonts/map/pdftex/updmap/pdftex.map}]
 Underfull \hbox (badness 10000) in paragraph at lines 55--56
 
  []
 
-<Figures/Picture1.png, id=17, 195.6108pt x 294.3798pt>
-File: Figures/Picture1.png Graphic file (type png)
- <use Figures/Picture1.png>
-Package pdftex.def Info: Figures/Picture1.png used on input line 57.
+<Figures/onelayer_renet.png, id=17, 195.6108pt x 294.3798pt>
+File: Figures/onelayer_renet.png Graphic file (type png)
+ <use Figures/onelayer_renet.png>
+Package pdftex.def Info: Figures/onelayer_renet.png used on input line 57.
 (pdftex.def)             Requested size: 88.02403pt x 132.46968pt.
 
-Underfull \hbox (badness 10000) in paragraph at lines 67--68
+Underfull \hbox (badness 10000) in paragraph at lines 64--65
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 69--70
+Underfull \hbox (badness 10000) in paragraph at lines 66--67
 
  []
 
-(/Users/kzhu9/Dropbox/16spring/NNDL6040/final/report/.texpadtmp/docultex.bbl [2 <./Figures/Picture1.png>]) [3] (/Users/kzhu9/Dropbox/16spring/NNDL6040/final/report/.texpadtmp/docultex.aux) ) 
+<Figures/data_aug.png, id=19, 593.21625pt x 635.37375pt>
+File: Figures/data_aug.png Graphic file (type png)
+ <use Figures/data_aug.png>
+Package pdftex.def Info: Figures/data_aug.png used on input line 69.
+(pdftex.def)             Requested size: 355.9325pt x 381.22719pt.
+ [2 <./Figures/onelayer_renet.png>]
+Missing character: There is no â in font cmr10!
+Missing character: There is no € in font cmr10!
+Missing character: There is no ™ in font cmr10!
+
+Underfull \hbox (badness 10000) in paragraph at lines 75--76
+
+ []
+
+<Figures/learning_rate.png, id=24, 645.41125pt x 60.225pt>
+File: Figures/learning_rate.png Graphic file (type png)
+ <use Figures/learning_rate.png>
+Package pdftex.def Info: Figures/learning_rate.png used on input line 78.
+(pdftex.def)             Requested size: 354.9773pt x 33.12384pt.
+
+Underfull \hbox (badness 10000) in paragraph at lines 83--84
+
+ []
+
+[3 <./Figures/data_aug.png> <./Figures/learning_rate.png>] <Figures/renet_network.png, id=30, 1206.5075pt x 272.01625pt>
+File: Figures/renet_network.png Graphic file (type png)
+ <use Figures/renet_network.png>
+Package pdftex.def Info: Figures/renet_network.png used on input line 85.
+(pdftex.def)             Requested size: 301.62613pt x 68.00389pt.
+
+Overfull \hbox (12.44931pt too wide) in paragraph at lines 95--96
+ \OT1/cmr/bx/n/10 4. Re-sult.[] \OT1/cmr/m/n/10 We've tested the model un-der mul-ti-ple com-bi-na-tion of hyper-parameters
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 113--115
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 116--117
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 118--119
+
+ []
+
+[4 <./Figures/renet_network.png>]
+Underfull \hbox (badness 10000) in paragraph at lines 120--121
+
+ []
+
+<Figures/algo.png, id=35, 469.755pt x 357.4956pt>
+File: Figures/algo.png Graphic file (type png)
+ <use Figures/algo.png>
+Package pdftex.def Info: Figures/algo.png used on input line 122.
+(pdftex.def)             Requested size: 375.80452pt x 285.99686pt.
+
+Overfull \hbox (5.42078pt too wide) in paragraph at lines 122--123
+ [] 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 126--127
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 128--129
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 130--131
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 132--133
+
+ []
+
+[5 <./Figures/algo.png>]
+Underfull \hbox (badness 10000) in paragraph at lines 135--136
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 137--138
+
+ []
+
+(/Users/kzhu9/Dropbox/16spring/NNDL6040/final/nn_proj/report/.texpadtmp/docultex.bbl
+Underfull \hbox (badness 10000) in paragraph at lines 141--1
+
+ []
+
+) [6] (/Users/kzhu9/Dropbox/16spring/NNDL6040/final/nn_proj/report/.texpadtmp/docultex.aux) ) 
 Here is how much of TeX's memory you used:
- 2825 strings out of 493109
- 37643 string characters out of 6135005
- 101252 words of memory out of 5000000
- 6228 multiletter control sequences out of 15000+600000
+ 2853 strings out of 493109
+ 38432 string characters out of 6135005
+ 103278 words of memory out of 5000000
+ 6252 multiletter control sequences out of 15000+600000
  10407 words of font info for 40 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 37i,9n,26p,925b,278s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 37i,9n,26p,1135b,207s stack positions out of 5000i,500n,10000p,200000b,80000s
 </usr/local/texlive/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb></usr/local/texlive/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx8.pfb></usr/local/texlive/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmcsc10.pfb></usr/local/texlive/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/local/texlive/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi7.pfb></usr/local/texlive/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/local/texlive/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/local/texlive/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></usr/local/texlive/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local/texlive/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy6.pfb></usr/local/texlive/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr/local/texlive/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmti8.pfb>
-Output written on /Users/kzhu9/Dropbox/16spring/NNDL6040/final/report/.texpadtmp/docultex.pdf (3 pages, 379139 bytes).
+Output written on /Users/kzhu9/Dropbox/16spring/NNDL6040/final/nn_proj/report/.texpadtmp/docultex.pdf (6 pages, 1034150 bytes).
 PDF statistics:
- 65 PDF objects out of 1000 (max. 8388607)
- 45 compressed objects within 1 object stream
+ 82 PDF objects out of 1000 (max. 8388607)
+ 51 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
- 6 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 26 words of extra memory for PDF output out of 10000 (max. 10000000)
 

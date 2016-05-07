@@ -520,7 +520,7 @@ def train_nn(train_model, validate_model, test_model,
                          this_validation_loss * 100.))
                 
                 if (best_validation_loss-this_validation_loss)*100 < 0.2:
-                    l_r.set_value(learning_rate/(1+d_lr*0.1))
+                    l_r.set_value(learning_rate/(1+d_lr*0.15))
                     d_lr += 1
                 # if we got the best validation score until now
                 if this_validation_loss < best_validation_loss:

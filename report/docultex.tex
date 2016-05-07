@@ -87,24 +87,24 @@ We've tested the model under multiple combination of hyper-parameters for the CI
 \text{CIFAR-10}
 \end{center}
 \begin{center}
-\begin{tabular}{l c c c c c c r}
+\begin{tabular}{l c c c c c c c r}
 \hline
-\#Schema & $d$ & $hu$ & $h$ & $batch$ & $aug$ & $adapt$ & Test error\\
+\#Schema & $d$ & $hu$ & $h$ & $batch$ & $aug$ & $adapt$ & error & Time\\
 \hline
-with augmentation & 80 & 500 & 1 & 200 & T & T & 39.41\%\\
-without augmentation & 80 & 500 & 1 & 200 & F & T & 38.21\%\\
-less hidden state of renet & 40 & 500 & 1 & 200 & F & T & 38.67\%\\
-less hidden unit of mlp & 80 & 200 & 1 & 200 & F & T & 39.76\%\\
-more hidden layer of mlp & 80 & 200 & 4 & 200 & F & T & 41.42\%\\
-No adapt learning & 80 & 500 & 1 & 200 & F & F & 39.97\%\\
-Best & 256 & 512 &  1 & 50 & F & T & 31.90\%\\
+with augmentation & 80 & 500 & 1 & 200 & T & T & 39.41\% & 17.58\\
+without augmentation & 80 & 500 & 1 & 200 & F & T & 38.21\% & 17.68\\
+less hidden state of renet & 40 & 500 & 1 & 200 & F & T & 38.67\% & 12.49\\
+less hidden unit of mlp & 80 & 200 & 1 & 200 & F & T & 39.76\% & 17.53\\
+more hidden layer of mlp & 80 & 200 & 4 & 200 & F & T & 41.42\% & 17.34\\
+No adapt learning & 80 & 500 & 1 & 200 & F & F & 39.97\% & 18.41\\
+Best & 256 & 512 &  1 & 50 & F & T & 31.90\% & 244.44\\
 \hline
 \end{tabular}	
 \end{center} 
 ~\\
-We set $d$ as the number of hidden units in each ReNet layer, $hd$ as the number of hidden units in each layer, $h$ as the number of hidden layer, $batch$ as the batch size, $aug$ as whether we use data augmentation preprocessing, $adapt$ as whether we use adaptive learning rate.\\
+We set $d$ as the number of hidden units in each ReNet layer, $hd$ as the number of hidden units in each layer, $h$ as the number of hidden layer, $batch$ as the batch size, $aug$ as whether we use data augmentation preprocessing, and$adapt$ as whether we use adaptive learning rate. The running time is measured by minutes.\\
 
-We've also tested the model for MNIST dataset, we managed to get $1.53\%$ test error given the parameter set as $\{d, hu, h, batch, aug, adapt\}=\{40, 250, 1, 200, F, F\}$.\\
+We've also tested the model for MNIST dataset, we managed to get $1.53\%$ test error given the parameter set as $\{d, hu, h, batch, aug, adapt\}=\{40, 250, 1, 200, F, F\}$. This takes 13.56 minutes.\\
 
 The test results are summarized in the above table. The first two columns show that with data augmentation, we do not gain a test error decrease, instead, the test error increased slightly. The $2$nd and the $3$rd column shows that we reduce the test error by $0.4\%$ with higher number of units in ReNet layer. The 2nd and the 4th column show that we reduce the test error by $1\%$ with higher number of hidden units. The 4th and 5th column shows that we reduce the test error by $2\%$ with less number of hidden units in MLP. The 2nd column and 6th column show that we reduce the test error by $2\%$ with adapted learning rate.\\
 

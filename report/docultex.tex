@@ -74,16 +74,13 @@ We applied adaptive learning rate algorithm to achieve better test accuracy. Bas
 \end{center}
 
 \subsection{Neural Network Implementation}
-% NEED GU SHEN LONG TO IMPLEMENT
-We implement our RNN demonstrated in the above figure. First, we input our image data to ReNet layer, then to the MLP Layer and finally to the 10-mode output layer. \\
-\begin{center}
-\includegraphics[scale=0.25]{Figures/renet_network}\\
-\end{center}For a ReNet layer, first, we sweep the image vertically with two RNNs, with one RNN working in a bottom-up direction and the other working in a topdown direction. Each RNN takes as an input one (flattened) patch at a time and updates its hidden state, working along each column j of the split input image. After this vertical, bidirectional sweep, we concatenate the intermediate hidden states (forward and backward) at each location of patch to get a composite feature map. Each state is now the activation of a feature detector at the corresponding location with respect to all the patches in the j-th column of the original input. Next we sweep over the obtained feature map horizontally with two RNN. In a similar manner as the vertical sweep, these RNNs work along each row resulting in the output feature map. Now, each vector represents the features of the original image patch in the context of the whole image. Moreover, the hidden state of each RNN that we used is Gated recurrent units. The hidden state of the GRU at time t is computed by \cite{DBLP:journals/corr/ChoMGBSB14}:
+For a ReNet layer, first, we sweep the image vertically with two RNNs, with one RNN working in a bottom-up direction and the other working in a topdown direction. Each RNN takes as an input one (flattened) patch at a time and updates its hidden state, working along each column j of the split input image. After this vertical, bidirectional sweep, we concatenate the intermediate hidden states (forward and backward) at each location of patch to get a composite feature map. Each state is now the activation of a feature detector at the corresponding location with respect to all the patches in the j-th column of the original input. Next we sweep over the obtained feature map horizontally with two RNN. In a similar manner as the vertical sweep, these RNNs work along each row resulting in the output feature map. Now, each vector represents the features of the original image patch in the context of the whole image. Moreover, the hidden state of each RNN that we used is Gated recurrent units. The hidden state of the GRU at time t is computed by \cite{DBLP:journals/corr/ChoMGBSB14}:
 \begin{eqnarray*}
 	h_t &=& (1-\mu_t)\odot h_{t-1}+\mu_t\odot \bar h_t\\
 	\bar h_t &=& \text{tanh} (Wx_t+U(r_t \odot h_{t-1})+b)\\
 	\lbrack u_t;r_t \rbrack &=& \sigma(W_g x_t+U_g h_{t-1}+b_g)
-\end{eqnarray*}
+\end{eqnarray*}
+For the actual code design, we find the similarity of this paper and the traditional convolutional neuron network, and just replace the homework 3 convolution layer with our renet layer (with a following mlp), and write the function test\_renet with some adjustable parameters to get experiment results.
 \section{Result} \label{result}
 We've tested the model under multiple combination of hyper-parameters for the CIFAR-10 dataset, and here is what we get:
 \begin{center}
@@ -100,6 +97,7 @@ less hidden state of renet & 40 & 500 & 1 & 200 & F & T & 28.67\%\\
 less hidden unit of mlp & 80 & 200 & 1 & 200 & F & T & 29.76\%\\
 more hidden layer of mlp & 80 & 200 & 4 & 200 & F & T & 31.42\%\\
 No adapt learning & 80 & 500 & 1 & 200 & F & F & 29.97\%\\
+Best & 256 & 512 &  1 & 50 & F & T & 21.90\%\\
 \hline
 \end{tabular}	
 \end{center} 
